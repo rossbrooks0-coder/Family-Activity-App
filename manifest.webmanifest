@@ -1,7 +1,7 @@
 {
   "name": "Little Explorers",
   "short_name": "Explorers",
-  "description": "Family-friendly walks, trails, parks and gardens for children aged 0–12.",
+  "description": "Family-friendly walks, trails, parks and gardens across Scotland for children aged 0–12.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

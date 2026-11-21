@@ -1,22 +1,28 @@
 # Little Explorers
 
-A mobile-first web app that helps parents and caregivers of children aged 0–12 find family-friendly outdoor activities: walks, trails, parks and gardens.
+A mobile-first web app that helps parents and caregivers of children aged 0–12 find family-friendly outdoor activities across Scotland: walks, trails, parks and gardens.
 
-It can be installed to a phone's home screen like a normal app (it's a "Progressive Web App").
-
-## What's in here
+It can be installed to a phone's home screen like a normal app (it's a "Progress## What's in here
 
 | File | What it does |
 | --- | --- |
 | `index.html` | The page shell: top bar, content area, bottom navigation |
 | `styles.css` | All the colours, spacing and layout |
-| `app.js` | Decides which screen to show and builds it |
-| `data.js` | **The example activities. Edit this to change the content.** |
+| `config.js` | **App name, plus where suggestions and feedback are sent** |
+| `data.js` | **The places, regions, badges and help questions. Edit this to change the content.** |
+| `store.js` | Remembers things on the phone: children, saved places, lists, visits |
+| `ui.js` | Shared building blocks (cards, pop-up panels, messages) |
+| `screens/` | One file per screen: welcome, home, explore, detail, saved, suggest, profile |
+| `app.js` | Decides which screen to show |
 | `manifest.webmanifest` | App name, colours and icons used when installed |
 | `sw.js` | Lets the app open fast and work offline |
 | `icons/` | The home-screen icons |
 
 There's no build step: these files can be hosted as they are.
+
+> All places, reviews and details in `data.js` are made-up placeholders.
+
+d as they are.
 
 ## Preview it on your phone (GitHub Pages, free)
 

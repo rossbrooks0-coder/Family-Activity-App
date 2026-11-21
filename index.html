@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Little Explorers</title>
+  <meta name="description" content="Find family-friendly walks, trails, parks and gardens for children aged 0–12." />
+  <meta name="theme-color" content="#2f9e6e" />
+
+  <!-- Makes it installable and look like an app on the home screen -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Explorers" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar" id="topbar"></header>
+
+  <main id="app" class="screen" tabindex="-1"></main>
+
+  <nav class="bottom-nav" aria-label="Main">
+    <a href="#/" data-tab="home"><span class="nav-icon" aria-hidden="true">🏠</span><span>Home</span></a>
+    <a href="#/explore" data-tab="explore"><span class="nav-icon" aria-hidden="true">🧭</span><span>Explore</span></a>
+    <a href="#/saved" data-tab="saved"><span class="nav-icon" aria-hidden="true">❤️</span><span>Saved</span></a>
+    <a href="#/profile" data-tab="profile"><span class="nav-icon" aria-hidden="true">👤</span><span>Profile</span></a>
+  </nav>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

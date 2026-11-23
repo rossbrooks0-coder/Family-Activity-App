@@ -34,6 +34,9 @@ function renderHome() {
     body = emptyHTML("telescope", `No ${plural} nearby yet`,
       r ? `Nothing within ${r} ${unitShort()} so far. Try a wider range.` : "Try another type of place",
       r ? `<button class="btn btn-primary" id="widen">Show further away</button>` : "");
+  } else if (homeType !== "All") {
+    // A single type is chosen: just show those places
+    body = `<div class="card-list type-results">${ranked.map((a) => cardHTML(a)).join("")}</div>`;
   } else {
     body = `
       ${heading("Picked for you")}
@@ -53,7 +56,7 @@ function renderHome() {
           <button class="range-btn" id="range">${icon("map-pin", 16)}<span>${rangeLabel}</span>${icon("chevron-down", 16)}</button>`,
     html: `
       <div class="type-row" role="group" aria-label="Type of place">
-        ${types.map((t) => `<button class="type-chip" data-type="${t}" aria-pressed="${t === homeType}">${t === "All" ? "All" : pluralType(t)}</button>`).join("")}
+        ${types.map((t) => `<button class="type-chip" data-type="${t}" aria-pressed="${t === homeType}">${icon(t === "All" ? "layout-grid" : TYPES[t], 18)}<span>${t === "All" ? "All" : pluralType(t)}</span></button>`).join("")}
       </div>
       ${body}`,
   });

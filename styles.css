@@ -132,13 +132,15 @@ body.no-nav .screen { padding-bottom: calc(env(safe-area-inset-bottom) + 128px);
 .type-row { display: flex; gap: 8px; overflow-x: auto; padding: 4px 16px; margin: 0 -16px; scroll-padding-inline: 16px; scrollbar-width: none; }
 .type-row::-webkit-scrollbar { display: none; }
 .type-chip {
-  flex: none; min-height: 40px; padding: 0 16px; border-radius: 10px;
+  flex: none; display: inline-flex; align-items: center; gap: 6px;
+  min-height: 40px; padding: 0 14px 0 12px; border-radius: 10px;
   border: 1px solid var(--line); background: var(--surface); color: var(--text-2);
   font-size: 15px; font-weight: 500;
   transition: background-color 150ms var(--ease), color 150ms var(--ease);
 }
 .type-chip[aria-pressed="true"] { background: var(--text); border-color: var(--text); color: var(--surface); }
 .type-row + .trail-title { margin-top: 24px; }
+.type-row + .type-results { margin-top: 16px; }
 
 /* ---------- Home top bar ---------- */
 .avatar {

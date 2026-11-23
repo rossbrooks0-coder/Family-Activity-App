@@ -235,3 +235,40 @@ function areaName() {
   if (Store.s.coords) return r ? `Near you (${r.name})` : "Near you";
   return r ? r.name : "All of Scotland";
 }
+
+// ---------- Family photo ----------
+function avatarHTML(size = 44) {
+  const s = Store.s;
+  const inner = s.photo
+    ? `<img src="${s.photo}" alt="" />`
+    : s.familyName
+      ? `<span class="avatar-initial">${esc(s.familyName.replace(/^the\s+/i, "").charAt(0).toUpperCase())}</span>`
+      : `<span class="avatar-emoji">👨‍👩‍👧</span>`;
+  return `<span class="avatar" style="--size:${size}px">${inner}</span>`;
+}
+
+// Let the parent pick a photo, shrink it so it fits on the phone, and save it
+function pickPhoto(onDone) {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.addEventListener("change", () => {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const size = 240;
+      const c = document.createElement("canvas");
+      c.width = c.height = size;
+      const side = Math.min(img.width, img.height);
+      c.getContext("2d").drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, size, size);
+      URL.revokeObjectURL(url);
+      Store.update((s) => { s.photo = c.toDataURL("image/jpeg", 0.85); });
+      onDone();
+    };
+    img.onerror = () => toast("Sorry, that photo couldn't be used");
+    img.src = url;
+  });
+  input.click();
+}

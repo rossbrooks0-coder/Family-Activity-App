@@ -7,11 +7,12 @@ const Explore = {
   selectedPin: null,
   reset() {
     this.q = "";
+    this.sort = "best";
     this.f = { types: [], age: "any", time: "any", distance: "any", facilities: [], free: false, rainy: false };
   },
   activeCount() {
     const f = this.f;
-    return f.types.length + f.facilities.length + (f.age !== "any") + (f.time !== "any") + (f.distance !== "any") + f.free + f.rainy;
+    return (this.sort !== "best") + f.types.length + f.facilities.length + (f.age !== "any") + (f.time !== "any") + (f.distance !== "any") + f.free + f.rainy;
   },
 };
 Explore.reset();
@@ -23,10 +24,10 @@ const TIME_OPTIONS = [
   { value: "long", label: "2 hrs +" },
 ];
 const SORT_OPTIONS = [
-  { value: "best", label: "Best match" },
-  { value: "nearest", label: "Nearest" },
-  { value: "shortest", label: "Shortest" },
-  { value: "popular", label: "Most popular" },
+  { value: "best", label: "✨ Best match" },
+  { value: "nearest", label: "📍 Nearest" },
+  { value: "shortest", label: "⏱️ Shortest" },
+  { value: "popular", label: "⭐ Most popular" },
 ];
 
 function exploreResults() {
@@ -74,10 +75,6 @@ function renderExplore() {
       </div>
       <div class="toolbar">
         <button class="btn btn-secondary small" id="open-filters">⚙️ Filters<span id="filter-count"></span></button>
-        <label class="select-wrap small">
-          <span class="sr-only">Sort by</span>
-          <select id="sort">${SORT_OPTIONS.map((o) => `<option value="${o.value}" ${o.value === Explore.sort ? "selected" : ""}>${o.label}</option>`).join("")}</select>
-        </label>
         <div class="segmented small" role="group" aria-label="View">
           <button data-view="list" aria-pressed="${Explore.view === "list"}">☰ List</button>
           <button data-view="map" aria-pressed="${Explore.view === "map"}">🗺️ Map</button>
@@ -89,7 +86,6 @@ function renderExplore() {
 
   $("#search").addEventListener("input", (e) => { Explore.q = e.target.value; drawResults(); });
   $("#search").addEventListener("keydown", (e) => { if (e.key === "Enter") e.target.blur(); });
-  $("#sort").addEventListener("change", (e) => { Explore.sort = e.target.value; drawResults(); });
   $$("[data-view]").forEach((b) => b.addEventListener("click", () => {
     Explore.view = b.dataset.view;
     $$("[data-view]").forEach((x) => x.setAttribute("aria-pressed", x === b));
@@ -102,10 +98,11 @@ function renderExplore() {
 function drawResults() {
   const list = exploreResults();
   const n = Explore.activeCount();
+  const sortNote = Explore.sort !== "best" ? ` · ${{ nearest: "nearest", shortest: "shortest", popular: "most popular" }[Explore.sort]} first` : "";
   $("#filter-count").textContent = n ? ` (${n})` : "";
   $("#active-filters").innerHTML = n
-    ? `<div class="result-line"><span>${list.length} place${list.length === 1 ? "" : "s"} found</span><button class="btn-link" id="clear-filters">Clear filters</button></div>`
-    : `<div class="result-line"><span>${list.length} place${list.length === 1 ? "" : "s"} in ${esc(areaName())}</span></div>`;
+    ? `<div class="result-line"><span>${list.length} place${list.length === 1 ? "" : "s"} found${sortNote}</span><button class="btn-link" id="clear-filters">Clear filters</button></div>`
+    : `<div class="result-line"><span>${list.length} place${list.length === 1 ? "" : "s"} in ${esc(areaName())}${sortNote}</span></div>`;
   const clear = $("#clear-filters");
   if (clear) clear.addEventListener("click", () => { const q = Explore.q; Explore.reset(); Explore.q = q; drawResults(); });
 
@@ -154,6 +151,9 @@ function openFilters() {
   const unit = Store.s.units === "miles" ? "miles" : "km";
   const hasRef = !!refPoint();
   const body = `
+    <h3 class="field-label">Sort by</h3>
+    ${chipGroup("sort", SORT_OPTIONS, [Explore.sort], { multi: false })}
+
     <h3 class="field-label">Type of place</h3>
     ${chipGroup("types", Object.keys(TYPES).map((t) => ({ value: t, label: `${TYPES[t]} ${t}` })), f.types)}
 
@@ -184,6 +184,7 @@ function openFilters() {
     $("#f-reset", sheet).addEventListener("click", () => { const q = Explore.q; Explore.reset(); Explore.q = q; closeSheet(); drawResults(); });
     $("#f-apply", sheet).addEventListener("click", () => {
       const other = chipValues(sheet, "other");
+      Explore.sort = chipValues(sheet, "sort")[0] || "best";
       Explore.f = {
         types: chipValues(sheet, "types"),
         age: chipValues(sheet, "age")[0] || "any",

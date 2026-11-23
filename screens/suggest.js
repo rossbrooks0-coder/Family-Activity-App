@@ -4,8 +4,8 @@ function renderSuggest() {
   const ageOpts = Array.from({ length: 13 }, (_, i) => `<option value="${i}">${i === 0 ? "Under 1" : i}</option>`).join("");
 
   UI.screen({
-    tab: "suggest",
-    top: UI.title("Suggest a place"),
+    tab: "",
+    top: UI.backBar("Suggest a place", "#/profile"),
     html: `
       <div class="intro-card">
         <span class="intro-icon">💡</span>
@@ -109,18 +109,18 @@ function sendSuggestion(sg) {
 
 function renderSuggestThanks() {
   UI.screen({
-    tab: "suggest",
-    top: UI.title("Thank you!"),
+    tab: "",
+    top: UI.backBar("Thank you!", "#/profile"),
     html: emptyHTML("🎉", "Thanks for your suggestion!", "We'll take a look and, if it's a good fit, add it to the app for other families to enjoy.",
-      `<div class="stack"><a class="btn btn-primary" href="#/suggest">Suggest another place</a><a class="btn btn-secondary" href="#/suggest/mine">See your suggestions</a></div>`),
+      `<div class="stack"><a class="btn btn-primary" href="#/suggest">Suggest another place</a><a class="btn btn-secondary" href="#/suggest/mine">See your suggestions</a><a class="btn btn-link" href="#/profile">Back to profile</a></div>`),
   });
 }
 
 function renderMySuggestions() {
   const list = [...Store.s.suggestions].reverse();
   UI.screen({
-    tab: "suggest",
-    top: UI.backBar("Your suggestions", "#/suggest"),
+    tab: "",
+    top: UI.backBar("Your suggestions", "#/profile"),
     html: list.length
       ? `<div class="menu">${list.map((sg) => `
           <div class="menu-row static">

@@ -3,6 +3,9 @@ const Store = (() => {
   const KEY = "little-explorers-v1";
   const defaults = () => ({
     onboarded: false,
+    familyName: "",        // e.g. "The Campbells"
+    photo: null,           // small profile photo (stored as an image text string)
+    homeRadius: null,      // home page range, in the user's units (null = anywhere)
     children: [],          // [{ id, name, age }]
     needs: [],             // facility ids that matter, e.g. ["pushchair", "toilets"]
     region: null,          // region id
@@ -81,6 +84,15 @@ function formatDistance(km) {
   return v < 1 ? `< 1 ${unit}` : `${Math.round(v)} ${unit}`;
 }
 function unitToKm(v) { return Store.s.units === "miles" ? v / 0.621 : v; }
+
+// Is this place inside the home page range?
+function withinHomeRange(a) {
+  const r = Store.s.homeRadius;
+  if (!r) return true;
+  const km = distanceKm(a);
+  return km == null || km <= unitToKm(r);
+}
+const unitShort = () => (Store.s.units === "miles" ? "miles" : "km");
 
 function currentSeason(d = new Date()) {
   const m = d.getMonth();

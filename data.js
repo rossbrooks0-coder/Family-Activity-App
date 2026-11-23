@@ -393,7 +393,7 @@ const BADGES = [
 const FAQ = [
   { q: "Is the app free?", a: "Yes, completely free for families." },
   { q: "Where is my information stored?", a: "Your children's ages, saved places and lists are kept on this phone only. Nothing is sent anywhere." },
-  { q: "How do I suggest a place?", a: "Tap the + Suggest button in the bottom bar and fill in what you know. We review every suggestion." },
+  { q: "How do I suggest a place?", a: "Go to your Profile (tap your photo on the home page), then 'Suggest a place'. We review every suggestion." },
   { q: "How do I add the app to my home screen?", a: "iPhone: tap Share, then 'Add to Home Screen'. Android: tap the ⋮ menu, then 'Install app'." },
   { q: "The information about a place is wrong", a: "Sorry! Please let us know using 'Send feedback' on the Profile page." },
 ];

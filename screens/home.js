@@ -1,6 +1,8 @@
 // Home screen
 let homeType = "All";
 
+const RADIUS_OPTIONS = [5, 10, 20, 30, 50];
+
 function renderHome() {
   const season = currentSeason();
   const seasonInfo = {
@@ -10,61 +12,72 @@ function renderHome() {
     winter: { title: "Winter days out", icon: "❄️" },
   }[season];
 
-  const ranked = [...ACTIVITIES].sort((a, b) => matchScore(b) - matchScore(a));
+  // Everything on the home page is limited to the chosen type and range
+  const ranked = ACTIVITIES
+    .filter((a) => homeType === "All" || a.type === homeType)
+    .filter(withinHomeRange)
+    .sort((a, b) => matchScore(b) - matchScore(a));
   const picked = ranked.slice(0, 5);
   const seasonal = ranked.filter((a) => a.seasons.includes(season)).slice(0, 6);
-  const rainy = ranked.filter((a) => a.rainy);
   const types = ["All", ...Object.keys(TYPES)];
-  const all = ranked.filter((a) => homeType === "All" || a.type === homeType);
 
   const row = (list, reason) => `<div class="hscroll">${list.map((a) => cardHTML(a, { compact: true, reason: reason ? matchReason(a) : "" })).join("")}</div>`;
 
-  const quick = [
-    { id: "short", icon: "⏱️", label: "Under 1 hour" },
-    { id: "rainy", icon: "☔", label: "Rainy day" },
-    { id: "free", icon: "💷", label: "Free" },
-    { id: "pushchair", icon: "👶", label: "Pushchair friendly" },
-  ];
+  const hasRef = !!refPoint();
+  const r = Store.s.homeRadius;
+  const rangeLabel = !hasRef ? "Set your area" : r ? `Within ${r} ${unitShort()}` : "Any distance";
 
-  UI.screen({
-    tab: "home",
-    top: `<h1>🌿 ${CONFIG.appName}</h1><div class="spacer"></div>
-          <a class="area-pill" href="#/profile/area" aria-label="Change area">📍 ${esc(areaName())}</a>`,
-    html: `
-      <div class="quick-grid">
-        ${quick.map((q) => `<button class="quick" data-quick="${q.id}"><span>${q.icon}</span>${q.label}</button>`).join("")}
-      </div>
-
+  let body;
+  if (!ranked.length) {
+    body = emptyHTML("🔭", "Nothing found nearby",
+      r ? `There are no ${homeType === "All" ? "places" : homeType.toLowerCase() + "s"} within ${r} ${unitShort()} yet. Try a bigger range.` : "Try another type of place.",
+      r ? `<button class="btn btn-primary" id="widen">Show further away</button>` : "");
+  } else {
+    body = `
       <h2 class="section-title">Picked for you</h2>
       ${!Store.s.children.length ? `<a class="nudge" href="#/profile/children">👶 Add your children's ages for better suggestions →</a>` : ""}
       ${row(picked, true)}
 
-      <h2 class="section-title">${seasonInfo.icon} ${seasonInfo.title}</h2>
-      ${row(seasonal)}
+      ${seasonal.length ? `<h2 class="section-title">${seasonInfo.icon} ${seasonInfo.title}</h2>${row(seasonal)}` : ""}
 
-      <h2 class="section-title">☔ Rainy day backups</h2>
-      ${row(rainy)}
+      <h2 class="section-title">Browse all <span class="count">${ranked.length}</span></h2>
+      <div class="card-list">${ranked.map((a) => cardHTML(a)).join("")}</div>`;
+  }
 
-      <h2 class="section-title">Browse all</h2>
-      <div class="chips" role="group" aria-label="Filter by type">
+  UI.screen({
+    tab: "home",
+    top: `<a class="avatar-link" href="#/profile" aria-label="Your profile">${avatarHTML(48)}</a>
+          <div class="spacer"></div>
+          <button class="range-pill" id="range">📍 ${rangeLabel} <span aria-hidden="true">▾</span></button>`,
+    html: `
+      <div class="chips" role="group" aria-label="Type of place">
         ${types.map((t) => `<button class="chip" data-type="${t}" aria-pressed="${t === homeType}">${TYPES[t] ? TYPES[t] + " " : ""}${t}</button>`).join("")}
       </div>
-      <div class="card-list">${all.map((a) => cardHTML(a)).join("") || emptyHTML("🔍", "Nothing here yet", "Try another type.")}</div>`,
+      ${body}`,
   });
 
   $$("[data-type]").forEach((b) => b.addEventListener("click", () => {
     homeType = b.dataset.type;
-    const y = window.scrollY;
     renderHome();
-    window.scrollTo(0, y);
   }));
-  $$("[data-quick]").forEach((b) => b.addEventListener("click", () => {
-    Explore.reset();
-    const q = b.dataset.quick;
-    if (q === "short") Explore.f.time = "short";
-    if (q === "rainy") Explore.f.rainy = true;
-    if (q === "free") Explore.f.free = true;
-    if (q === "pushchair") Explore.f.facilities = ["pushchair"];
-    location.hash = "#/explore";
-  }));
+  $("#range").addEventListener("click", () => (hasRef ? openRangePicker() : (location.hash = "#/profile/area")));
+  const widen = $("#widen");
+  if (widen) widen.addEventListener("click", () => { Store.update((s) => { s.homeRadius = null; }); renderHome(); });
+}
+
+function openRangePicker() {
+  const unit = unitShort();
+  const current = Store.s.homeRadius ? String(Store.s.homeRadius) : "any";
+  openSheet("Show places within", `
+    <p class="muted">Measured from <strong>${esc(areaName())}</strong> · <a class="link" href="#/profile/area">Change</a></p>
+    <div class="radio-list">
+      ${[...RADIUS_OPTIONS.map((r) => ({ v: String(r), label: `${r} ${unit}` })), { v: "any", label: "Any distance" }]
+        .map((o) => `<button type="button" class="radio-row" data-r="${o.v}" aria-pressed="${o.v === current}"><span>${o.label}</span><span class="tick">✓</span></button>`).join("")}
+    </div>`, (sheet) => {
+    $$("[data-r]", sheet).forEach((b) => b.addEventListener("click", () => {
+      Store.update((s) => { s.homeRadius = b.dataset.r === "any" ? null : Number(b.dataset.r); });
+      closeSheet();
+      renderHome();
+    }));
+  });
 }

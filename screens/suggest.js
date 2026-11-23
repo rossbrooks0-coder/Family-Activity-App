@@ -7,11 +7,8 @@ function renderSuggest() {
     tab: "",
     top: UI.backBar("Suggest a place", "#/profile"),
     html: `
-      <div class="intro-card">
-        <span class="intro-icon">💡</span>
-        <div><strong>Found a great family spot?</strong><p>Tell us about it! We check every suggestion and add the best ones to the app.</p></div>
-      </div>
-      ${mine ? `<a class="nudge" href="#/suggest/mine">📬 Your suggestions (${mine}) →</a>` : ""}
+      <p class="lede">Know a family-friendly place we're missing? Tell us about it. We read every suggestion and add the ones that fit.</p>
+      ${mine ? `<a class="hint-row" href="#/suggest/mine">${icon("send", 18)}<span>Your suggestions</span><span class="hint-count">${mine}</span>${icon("chevron-right", 18)}</a>` : ""}
 
       <form id="suggest-form" class="form" novalidate>
         <label class="field">
@@ -28,7 +25,7 @@ function renderSuggest() {
         </label>
 
         <span class="field-label">What kind of place?</span>
-        ${chipGroup("type", [...Object.keys(TYPES), "Other"].map((t) => ({ value: t, label: `${TYPES[t] || "✨"} ${t}` })), [], { multi: false })}
+        ${chipGroup("type", [...typeOptions(), { value: "Other", label: "Other" }], [], { multi: false })}
 
         <div class="two-col">
           <label class="field"><span class="field-label">Good from age</span><span class="select-wrap"><select name="ageMin">${ageOpts}</select></span></label>
@@ -39,7 +36,7 @@ function renderSuggest() {
         ${chipGroup("time", [{ value: "Under 1 hr", label: "Under 1 hr" }, { value: "1–2 hrs", label: "1–2 hrs" }, { value: "Half a day", label: "Half a day" }, { value: "All day", label: "All day" }], [], { multi: false })}
 
         <span class="field-label">What's there?</span>
-        ${chipGroup("facilities", Object.keys(FACILITIES).map((k) => ({ value: k, label: `${FACILITIES[k].icon} ${FACILITIES[k].label}` })), [])}
+        ${chipGroup("facilities", facilityOptions(), [])}
 
         <label class="field">
           <span class="field-label">Why do you recommend it? <em>*</em></span>
@@ -47,10 +44,10 @@ function renderSuggest() {
         </label>
         <label class="field">
           <span class="field-label">Anything else parents should know?</span>
-          <textarea class="input" name="tips" rows="3" maxlength="1000" placeholder="Parking, costs, opening times, muddy paths, best time to go…"></textarea>
+          <textarea class="input" name="tips" rows="3" maxlength="1000" placeholder="Parking, costs, opening times, muddy paths, best time to go"></textarea>
         </label>
 
-        <h3 class="form-section">About you (optional)</h3>
+        <h3 class="form-section">About you <span class="muted">(optional)</span></h3>
         <label class="field">
           <span class="field-label">Your first name</span>
           <input class="input" name="by" maxlength="40" autocomplete="given-name" />
@@ -60,8 +57,8 @@ function renderSuggest() {
           <input class="input" name="email" type="email" maxlength="120" autocomplete="email" inputmode="email" />
         </label>
 
-        <button class="btn btn-primary full big" type="submit">📬 Send suggestion</button>
-        <p class="muted small-text center">By sending, you're happy for us to use these details to add the place to ${CONFIG.appName}.</p>
+        <button class="btn btn-primary full" type="submit">${icon("send", 18)}Send suggestion</button>
+        <p class="muted small-text center">By sending, you're happy for us to use these details to add the place to ${CONFIG.appName}</p>
       </form>`,
   });
 
@@ -110,8 +107,8 @@ function sendSuggestion(sg) {
 function renderSuggestThanks() {
   UI.screen({
     tab: "",
-    top: UI.backBar("Thank you!", "#/profile"),
-    html: emptyHTML("🎉", "Thanks for your suggestion!", "We'll take a look and, if it's a good fit, add it to the app for other families to enjoy.",
+    top: UI.backBar("Suggestion sent", "#/profile"),
+    html: emptyHTML("circle-check", "Thanks for the suggestion", "We'll take a look and, if it's a good fit, add it to the app for other families to enjoy.",
       `<div class="stack"><a class="btn btn-primary" href="#/suggest">Suggest another place</a><a class="btn btn-secondary" href="#/suggest/mine">See your suggestions</a><a class="btn btn-link" href="#/profile">Back to profile</a></div>`),
   });
 }
@@ -122,12 +119,12 @@ function renderMySuggestions() {
     tab: "",
     top: UI.backBar("Your suggestions", "#/profile"),
     html: list.length
-      ? `<div class="menu">${list.map((sg) => `
-          <div class="menu-row static">
-            <span class="list-thumb" style="--c:#cfe8da">${TYPES[sg.type] || "💡"}</span>
-            <span class="menu-text"><strong>${esc(sg.name)}</strong><small>${esc(sg.location)} · ${new Date(sg.date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</small></span>
-            <span class="status-pill">${esc(sg.status)}</span>
+      ? `<div class="list-card">${list.map((sg) => `
+          <div class="row">
+            ${thumbHTML(TYPES[sg.type] || "lightbulb")}
+            <span class="row-text"><strong>${esc(sg.name)}</strong><small>${esc(sg.location)} · ${new Date(sg.date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</small></span>
+            <span class="status">${esc(sg.status)}</span>
           </div>`).join("")}</div>`
-      : emptyHTML("📬", "No suggestions yet", "Places you suggest will appear here.", `<a class="btn btn-primary" href="#/suggest">Suggest a place</a>`),
+      : emptyHTML("send", "No suggestions yet", "Places you suggest will appear here", `<a class="btn btn-primary" href="#/suggest">Suggest a place</a>`),
   });
 }

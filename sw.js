@@ -1,5 +1,5 @@
 // Service worker: keeps a copy of the app so it opens quickly and works offline.
-const CACHE = "little-explorers-v4";
+const CACHE = "little-explorers-v5";
 const FILES = [
   "./", "index.html", "styles.css", "config.js", "data.js", "store.js", "ui.js", "app.js",
   "screens/welcome.js", "screens/home.js", "screens/explore.js", "screens/detail.js",

@@ -2,7 +2,6 @@
 let homeType = "All";
 
 const RADIUS_OPTIONS = [5, 10, 20, 30, 50];
-const pluralType = (t) => (t === "Beach" ? "Beaches" : t + "s");
 
 function renderHome() {
   const season = currentSeason();

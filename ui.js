@@ -8,7 +8,7 @@ const UI = {
   topbar: document.getElementById("topbar"),
   nav: document.querySelector(".bottom-nav"),
 
-  // Draw a screen. opts: { tab, title, back, actions, html, nav }
+  // Draw a screen. opts: { tab, top, html, nav }
   screen({ tab = "", top = "", html = "", nav = true }) {
     this.topbar.innerHTML = top;
     this.topbar.hidden = !top;
@@ -29,7 +29,7 @@ const UI = {
 
   title: (t) => `<h1>${t}</h1>`,
   backBar: (title = "", fallback = "#/", extra = "") =>
-    `<button class="icon-btn" id="back" data-fallback="${fallback}" aria-label="Back">←</button>
+    `<button class="icon-btn" id="back" data-fallback="${fallback}" aria-label="Back">${icon("arrow-left", 20)}</button>
      ${title ? `<h1 class="bar-title">${title}</h1>` : ""}<div class="spacer"></div>${extra}`,
 };
 
@@ -38,18 +38,13 @@ function goBack(fallback) {
   else location.hash = fallback;
 }
 
+// Section heading with the dotted trail line (the app's signature detail)
+const trailTitle = (text, extra = "") => `<h2 class="trail-title"><span>${text}</span>${extra}</h2>`;
+
 // ---------- Cards ----------
 // Quiet photo slot until real photos arrive: a plain surface with the type's icon
 function photoSlotHTML(a, size = 28) {
-  return `<div class="photo-slot" role="img" aria-label="Photo of ${esc(a.name)} to come">${icon(TYPE_ICONS[a.type], size)}</div>`;
-}
-
-function photoHTML(a, { label = true, badge = true } = {}) {
-  return `<div class="photo" style="--c:${a.colour}" role="img" aria-label="Photo placeholder for ${esc(a.name)}">
-      ${badge ? `<span class="badge">${TYPES[a.type] || ""} ${esc(a.type)}</span>` : ""}
-      <span class="photo-emoji">${a.emoji}</span>
-      ${label ? `<span class="label">Photo coming soon</span>` : ""}
-    </div>`;
+  return `<div class="photo-slot" role="img" aria-label="Photo of ${esc(a.name)} to come">${icon(TYPES[a.type], size)}</div>`;
 }
 
 function tagsFor(a, max = 3) {
@@ -77,12 +72,18 @@ function cardHTML(a, { compact = false, reason = "" } = {}) {
     </a>`;
 }
 
+// Small square thumbnail used in lists
+const thumbHTML = (iconName) => `<span class="thumb">${icon(iconName, 20)}</span>`;
+
 const stars = (n) => "★★★★★".slice(0, Math.round(n)) + "☆☆☆☆☆".slice(0, 5 - Math.round(n));
 
 function emptyHTML(sym, title, text, button = "") {
-  // sym can be an icon name from icons.js or (for not-yet-redesigned screens) an emoji
-  const art = ICONS[sym] ? `<span class="empty-icon">${icon(sym, 28)}</span>` : `<div class="big">${sym}</div>`;
-  return `<div class="empty">${art}<h2>${title}</h2><p>${text}</p>${button}</div>`;
+  return `<div class="empty"><span class="empty-icon">${icon(sym, 28)}</span><h2>${title}</h2><p>${text}</p>${button}</div>`;
+}
+
+// ---------- Badges (stitched patches) ----------
+function badgeHTML(b, earned = true, size = 64) {
+  return `<span class="patch ${earned ? "earned" : ""}" style="--patch:${b.colour};--size:${size}px">${icon(b.icon, Math.round(size * 0.42))}</span>`;
 }
 
 // ---------- Toast (little message at the bottom) ----------
@@ -90,7 +91,7 @@ let toastTimer;
 function toast(msg) {
   let t = $("#toast");
   if (!t) { t = document.createElement("div"); t.id = "toast"; t.setAttribute("role", "status"); document.body.appendChild(t); }
-  t.innerHTML = msg;
+  t.textContent = msg;
   t.classList.add("show");
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove("show"), 2600);
@@ -99,6 +100,8 @@ function toast(msg) {
 // ---------- Bottom sheet (panel that slides up) ----------
 function openSheet(title, bodyHTML, onMount) {
   closeSheet();
+  const t = $("#toast");
+  if (t) t.classList.remove("show");
   const wrap = document.createElement("div");
   wrap.className = "sheet-wrap";
   wrap.innerHTML = `
@@ -128,9 +131,10 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSheet
 // ---------- Reusable pickers ----------
 const ageLabel = (age) => (age === 0 ? "Under 1" : `${age} yr${age === 1 ? "" : "s"}`);
 
+// Options: [{ value, label, icon? }]
 function chipGroup(name, options, selected, { multi = true } = {}) {
   return `<div class="chip-wrap" data-group="${name}" data-multi="${multi}">
-    ${options.map((o) => `<button type="button" class="chip" data-value="${esc(o.value)}" aria-pressed="${selected.includes(o.value)}">${o.label}</button>`).join("")}
+    ${options.map((o) => `<button type="button" class="chip" data-value="${esc(o.value)}" aria-pressed="${selected.includes(o.value)}">${o.icon ? icon(o.icon, 16) : ""}${o.label}</button>`).join("")}
   </div>`;
 }
 function bindChipGroups(root) {
@@ -145,25 +149,25 @@ function bindChipGroups(root) {
   });
 }
 const chipValues = (root, name) => $$(`.chip-wrap[data-group="${name}"] .chip[aria-pressed="true"]`, root).map((c) => c.dataset.value);
+const facilityOptions = () => Object.keys(FACILITIES).map((k) => ({ value: k, label: FACILITIES[k].label, icon: FACILITIES[k].icon }));
+const typeOptions = () => Object.keys(TYPES).map((t) => ({ value: t, label: t, icon: TYPES[t] }));
 
 // Children editor (used in welcome screens and profile)
 function childrenEditorHTML() {
   const kids = Store.s.children;
   return `
-    <div class="kid-list">
-      ${kids.length ? kids.map((k) => `
-        <div class="kid-row">
-          <span class="kid-avatar">${k.age < 2 ? "👶" : k.age < 6 ? "🧒" : "🧑"}</span>
-          <div class="kid-text"><strong>${esc(k.name || "Child")}</strong><span>${ageLabel(k.age)}</span></div>
-          <button type="button" class="icon-btn small" data-remove="${k.id}" aria-label="Remove ${esc(k.name || "child")}">✕</button>
-        </div>`).join("") : `<p class="muted">No children added yet.</p>`}
-    </div>
-    <div class="add-kid card-box">
+    ${kids.length ? `<div class="list-card">${kids.map((k) => `
+        <div class="row">
+          <span class="initial">${esc((k.name || "C").charAt(0).toUpperCase())}</span>
+          <span class="row-text"><strong>${esc(k.name || "Child")}</strong><small>${ageLabel(k.age)}</small></span>
+          <button type="button" class="icon-btn small" data-remove="${k.id}" aria-label="Remove ${esc(k.name || "child")}">${icon("x", 16)}</button>
+        </div>`).join("")}</div>` : ""}
+    <div class="form-card">
       <label class="field-label" for="kid-name">Name (optional)</label>
       <input id="kid-name" class="input" placeholder="e.g. Isla" maxlength="30" autocomplete="off" />
       <span class="field-label">Age</span>
       ${chipGroup("kid-age", Array.from({ length: 13 }, (_, i) => ({ value: String(i), label: i === 0 ? "Under 1" : String(i) })), [], { multi: false })}
-      <button type="button" class="btn btn-secondary full" id="add-kid">＋ Add child</button>
+      <button type="button" class="btn btn-secondary full" id="add-kid">${icon("plus", 18)}Add child</button>
     </div>`;
 }
 function bindChildrenEditor(root, rerender) {
@@ -174,7 +178,7 @@ function bindChildrenEditor(root, rerender) {
   }));
   $("#add-kid", root).addEventListener("click", () => {
     const age = chipValues(root, "kid-age")[0];
-    if (age == null) return toast("Please pick an age");
+    if (age == null) return toast("Pick an age first");
     const name = $("#kid-name", root).value.trim();
     Store.update((s) => { s.children.push({ id: uid(), name, age: Number(age) }); });
     rerender();
@@ -184,16 +188,15 @@ function bindChildrenEditor(root, rerender) {
 // Needs picker (big tiles)
 const NEED_OPTIONS = ["pushchair", "toilets", "babyChanging", "cafe", "parking", "playground", "dogs", "accessible"];
 function needsPickerHTML(selected = Store.s.needs) {
-  return `<div class="tiles" data-group="needs">
+  return `<div class="tiles">
     ${NEED_OPTIONS.map((n) => `<button type="button" class="tile" data-value="${n}" aria-pressed="${selected.includes(n)}">
-      <span class="tile-icon">${FACILITIES[n].icon}</span><span>${FACILITIES[n].label}</span></button>`).join("")}
+      ${icon(FACILITIES[n].icon, 24)}<span>${FACILITIES[n].label}</span></button>`).join("")}
   </div>`;
 }
 function bindNeedsPicker(root, onChange) {
   $$(".tile", root).forEach((t) => t.addEventListener("click", () => {
     t.setAttribute("aria-pressed", t.getAttribute("aria-pressed") !== "true");
-    const vals = $$(".tile[aria-pressed='true']", root).map((x) => x.dataset.value);
-    onChange(vals);
+    onChange($$(".tile[aria-pressed='true']", root).map((x) => x.dataset.value));
   }));
 }
 
@@ -202,12 +205,12 @@ function areaPickerHTML() {
   const s = Store.s;
   return `
     <button type="button" class="btn ${s.coords ? "btn-primary" : "btn-secondary"} full" id="use-location">
-      📍 ${s.coords ? "Using your location ✓" : "Use my location"}
+      ${icon("locate-fixed", 18)}${s.coords ? "Using your location" : "Use my location"}
     </button>
     <p class="or">or choose a region</p>
-    <div class="radio-list">
-      ${REGIONS.map((r) => `<button type="button" class="radio-row" data-region="${r.id}" aria-pressed="${s.region === r.id}">
-        <span>${r.name}</span><span class="tick">✓</span></button>`).join("")}
+    <div class="choice-list">
+      ${REGIONS.map((r) => `<button type="button" class="choice" data-region="${r.id}" aria-pressed="${s.region === r.id}">
+        <span>${r.name}</span>${icon("check", 18)}</button>`).join("")}
     </div>`;
 }
 function bindAreaPicker(root, rerender) {
@@ -218,7 +221,7 @@ function bindAreaPicker(root, rerender) {
   $("#use-location", root).addEventListener("click", () => {
     if (Store.s.coords) { Store.update((s) => { s.coords = null; }); return rerender(); }
     if (!navigator.geolocation) return toast("Location isn't available on this device");
-    toast("Finding you…");
+    toast("Finding your location…");
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude: lat, longitude: lng } = pos.coords;
@@ -228,10 +231,10 @@ function bindAreaPicker(root, rerender) {
           return d < best.d ? { r, d } : best;
         }, { d: Infinity }).r;
         Store.update((s) => { s.coords = { lat, lng }; s.region = nearest.id; });
-        toast("Got it! 📍");
+        toast("Location set");
         rerender();
       },
-      () => toast("Couldn't get your location – please pick a region"),
+      () => toast("Couldn't get your location. Pick a region instead."),
       { timeout: 10000, maximumAge: 600000 }
     );
   });
@@ -250,7 +253,7 @@ function avatarHTML(size = 44) {
     ? `<img src="${s.photo}" alt="" />`
     : s.familyName
       ? `<span class="avatar-initial">${esc(s.familyName.replace(/^the\s+/i, "").charAt(0).toUpperCase())}</span>`
-      : `<span class="avatar-emoji">${icon("users", Math.round(size * 0.45))}</span>`;
+      : icon("users", Math.round(size * 0.45));
   return `<span class="avatar" style="--size:${size}px">${inner}</span>`;
 }
 
@@ -281,4 +284,4 @@ function pickPhoto(onDone) {
 }
 
 // Fill in the bottom bar icons
-document.querySelectorAll("[data-icon]").forEach((el) => { el.innerHTML = icon(el.dataset.icon, 24); });
+$$("[data-icon]").forEach((el) => { el.innerHTML = icon(el.dataset.icon, 24); });

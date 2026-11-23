@@ -24,10 +24,10 @@ const TIME_OPTIONS = [
   { value: "long", label: "2 hrs +" },
 ];
 const SORT_OPTIONS = [
-  { value: "best", label: "✨ Best match" },
-  { value: "nearest", label: "📍 Nearest" },
-  { value: "shortest", label: "⏱️ Shortest" },
-  { value: "popular", label: "⭐ Most popular" },
+  { value: "best", label: "Best match" },
+  { value: "nearest", label: "Nearest" },
+  { value: "shortest", label: "Shortest" },
+  { value: "popular", label: "Most popular" },
 ];
 
 function exploreResults() {
@@ -70,14 +70,15 @@ function renderExplore() {
     top: UI.title("Explore"),
     html: `
       <div class="search-wrap">
-        <span class="search-icon" aria-hidden="true">🔍</span>
-        <input id="search" class="input search" type="search" placeholder="Search places, towns, regions…" value="${esc(Explore.q)}" autocomplete="off" enterkeyhint="search" aria-label="Search" />
+        <span class="search-icon">${icon("search", 18)}</span>
+        <input id="search" class="input search" type="search" placeholder="Search" value="${esc(Explore.q)}" autocomplete="off" enterkeyhint="search" aria-label="Search" />
       </div>
       <div class="toolbar">
-        <button class="btn btn-secondary small" id="open-filters">⚙️ Filters<span id="filter-count"></span></button>
+        <button class="btn btn-secondary small" id="open-filters">${icon("sliders-horizontal", 18)}Filters<span id="filter-count" class="count-badge"></span></button>
+        <div class="spacer"></div>
         <div class="segmented small" role="group" aria-label="View">
-          <button data-view="list" aria-pressed="${Explore.view === "list"}">☰ List</button>
-          <button data-view="map" aria-pressed="${Explore.view === "map"}">🗺️ Map</button>
+          <button data-view="list" aria-pressed="${Explore.view === "list"}">${icon("list", 16)}List</button>
+          <button data-view="map" aria-pressed="${Explore.view === "map"}">${icon("map", 16)}Map</button>
         </div>
       </div>
       <div id="active-filters"></div>
@@ -99,7 +100,7 @@ function drawResults() {
   const list = exploreResults();
   const n = Explore.activeCount();
   const sortNote = Explore.sort !== "best" ? ` · ${{ nearest: "nearest", shortest: "shortest", popular: "most popular" }[Explore.sort]} first` : "";
-  $("#filter-count").textContent = n ? ` (${n})` : "";
+  $("#filter-count").textContent = n ? String(n) : "";
   $("#active-filters").innerHTML = n
     ? `<div class="result-line"><span>${list.length} place${list.length === 1 ? "" : "s"} found${sortNote}</span><button class="btn-link" id="clear-filters">Clear filters</button></div>`
     : `<div class="result-line"><span>${list.length} place${list.length === 1 ? "" : "s"} in ${esc(areaName())}${sortNote}</span></div>`;
@@ -108,7 +109,7 @@ function drawResults() {
 
   const box = $("#results");
   if (!list.length) {
-    box.innerHTML = emptyHTML("🔍", "No places match", "Try removing a filter or searching for something else.");
+    box.innerHTML = emptyHTML("search", "No places match", "Try removing a filter or searching for something else.");
     return;
   }
   if (Explore.view === "list") {
@@ -131,11 +132,11 @@ function mapHTML(list) {
   const sel = list.find((a) => a.id === Explore.selectedPin) || null;
   return `
     <div class="map" role="region" aria-label="Map of places (preview)">
-      <span class="map-note">Map preview – a real map is coming soon</span>
+      <span class="map-note">Preview map</span>
       ${me ? `<span class="map-me" style="${mapPos(me.lat, me.lng)}" title="You"></span>` : ""}
-      ${list.map((a) => `<button class="pin${sel && sel.id === a.id ? " on" : ""}" data-pin="${a.id}" style="${mapPos(a.lat, a.lng)}" aria-label="${esc(a.name)}">${a.emoji}</button>`).join("")}
+      ${list.map((a) => `<button class="pin${sel && sel.id === a.id ? " on" : ""}" data-pin="${a.id}" style="${mapPos(a.lat, a.lng)}" aria-label="${esc(a.name)}">${icon(TYPES[a.type], 18)}</button>`).join("")}
     </div>
-    <div id="pin-card">${sel ? cardHTML(sel) : `<p class="muted center">Tap a pin to see the place.</p>`}</div>`;
+    <div id="pin-card">${sel ? cardHTML(sel) : `<p class="muted center">Tap a pin to see the place</p>`}</div>`;
 }
 function bindMap(list) {
   $$("[data-pin]").forEach((b) => b.addEventListener("click", () => {
@@ -155,7 +156,7 @@ function openFilters() {
     ${chipGroup("sort", SORT_OPTIONS, [Explore.sort], { multi: false })}
 
     <h3 class="field-label">Type of place</h3>
-    ${chipGroup("types", Object.keys(TYPES).map((t) => ({ value: t, label: `${TYPES[t]} ${t}` })), f.types)}
+    ${chipGroup("types", typeOptions(), f.types)}
 
     <h3 class="field-label">Suitable for age</h3>
     ${chipGroup("age", AGE_GROUPS.map((g) => ({ value: g.id, label: g.label })), [f.age], { multi: false })}
@@ -166,13 +167,13 @@ function openFilters() {
     <h3 class="field-label">Distance</h3>
     ${hasRef
       ? chipGroup("distance", [{ value: "any", label: "Any" }, ...[5, 10, 25, 50].map((d) => ({ value: String(d), label: `Within ${d} ${unit}` }))], [f.distance], { multi: false })
-      : `<p class="muted small-text">Set your area in Profile to filter by distance.</p>`}
+      : `<p class="muted small-text">Set your area in Profile to filter by distance</p>`}
 
     <h3 class="field-label">Facilities</h3>
-    ${chipGroup("facilities", Object.keys(FACILITIES).map((k) => ({ value: k, label: `${FACILITIES[k].icon} ${FACILITIES[k].label}` })), f.facilities)}
+    ${chipGroup("facilities", facilityOptions(), f.facilities)}
 
     <h3 class="field-label">Other</h3>
-    ${chipGroup("other", [{ value: "free", label: "💷 Free only" }, { value: "rainy", label: "☔ Good on rainy days" }], [f.free && "free", f.rainy && "rainy"].filter(Boolean))}
+    ${chipGroup("other", [{ value: "free", label: "Free only" }, { value: "rainy", label: "Good on rainy days", icon: "cloud-rain" }], [f.free && "free", f.rainy && "rainy"].filter(Boolean))}
 
     <div class="sheet-actions">
       <button class="btn btn-secondary" id="f-reset">Reset</button>

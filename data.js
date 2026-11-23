@@ -4,39 +4,39 @@
 // ============================================================
 
 // Facilities / features a place can have
+// (icon names refer to the line icons in icons.js)
 const FACILITIES = {
-  pushchair:    { label: "Pushchair friendly",    icon: "👶" },
-  toilets:      { label: "Toilets",               icon: "🚻" },
-  babyChanging: { label: "Baby changing",         icon: "🍼" },
-  cafe:         { label: "Café",                  icon: "☕" },
-  parking:      { label: "Parking",               icon: "🅿️" },
-  playground:   { label: "Playground",            icon: "🛝" },
-  picnic:       { label: "Picnic area",           icon: "🧺" },
-  dogs:         { label: "Dog friendly",          icon: "🐕" },
-  accessible:   { label: "Wheelchair accessible", icon: "♿" },
+  pushchair:    { label: "Pushchair friendly",    icon: "baby" },
+  toilets:      { label: "Toilets",               icon: "toilet" },
+  babyChanging: { label: "Baby changing",         icon: "bath" },
+  cafe:         { label: "Café",                  icon: "coffee" },
+  parking:      { label: "Parking",               icon: "square-parking" },
+  playground:   { label: "Playground",            icon: "ferris-wheel" },
+  picnic:       { label: "Picnic area",           icon: "sandwich" },
+  dogs:         { label: "Dog friendly",          icon: "dog" },
+  accessible:   { label: "Wheelchair accessible", icon: "accessibility" },
 };
 
 // Order facilities appear as tags on cards
 const TAG_PRIORITY = ["pushchair", "toilets", "babyChanging", "cafe", "playground", "dogs", "accessible", "parking", "picnic"];
 
-// Types of activity
+// Types of activity, with the line icon for each
 const TYPES = {
-  Walk:   "🥾",
-  Trail:  "🌲",
-  Park:   "🛝",
-  Garden: "🌷",
-  Beach:  "🏖️",
-  Farm:   "🐑",
-};
-
-// Line icon for each type (see icons.js)
-const TYPE_ICONS = {
-  Walk: "footprints",
-  Trail: "signpost",
-  Park: "tree-deciduous",
+  Walk:   "footprints",
+  Trail:  "signpost",
+  Park:   "tree-deciduous",
   Garden: "flower-2",
-  Beach: "waves",
-  Farm: "tractor",
+  Beach:  "waves",
+  Farm:   "tractor",
+};
+const TYPE_ICONS = TYPES;
+const pluralType = (t) => (t === "Beach" ? "Beaches" : t + "s");
+
+const SEASONS = {
+  spring: { label: "Spring", icon: "sprout" },
+  summer: { label: "Summer", icon: "sun" },
+  autumn: { label: "Autumn", icon: "leaf" },
+  winter: { label: "Winter", icon: "snowflake" },
 };
 
 // Scottish regions (centre points are approximate)
@@ -386,18 +386,19 @@ const ACTIVITIES = [
 ];
 
 // Badges children can earn by marking "We've been here!"
+// Each badge is drawn as a stitched patch in a colour from the Scottish outdoors
 const BADGES = [
-  { id: "first",   icon: "🥾", name: "First Adventure",     desc: "Visit your first place",       test: (v) => v.length >= 1 },
-  { id: "five",    icon: "🌟", name: "Super Explorer",      desc: "Visit 5 places",              test: (v) => v.length >= 5 },
-  { id: "ten",     icon: "🏆", name: "Adventure Legend",    desc: "Visit 10 places",             test: (v) => v.length >= 10 },
-  { id: "forest",  icon: "🌲", name: "Forest Explorer",     desc: "Visit a trail",               test: (v, a) => a.some((x) => x.type === "Trail") },
-  { id: "walk",    icon: "🚶", name: "Wee Wanderer",        desc: "Go on a walk",                test: (v, a) => a.some((x) => x.type === "Walk") },
-  { id: "park",    icon: "🛝", name: "Park Champion",       desc: "Visit a park",                test: (v, a) => a.some((x) => x.type === "Park") },
-  { id: "garden",  icon: "🌷", name: "Garden Detective",    desc: "Visit a garden",              test: (v, a) => a.some((x) => x.type === "Garden") },
-  { id: "beach",   icon: "🐚", name: "Beachcomber",         desc: "Visit a beach",               test: (v, a) => a.some((x) => x.type === "Beach") },
-  { id: "farm",    icon: "🐑", name: "Farm Friend",         desc: "Visit a farm",                test: (v, a) => a.some((x) => x.type === "Farm") },
-  { id: "rain",    icon: "☔", name: "Rainy Day Hero",      desc: "Visit a rainy-day place",     test: (v, a) => a.some((x) => x.rainy) },
-  { id: "regions", icon: "🗺️", name: "Scotland Roamer",     desc: "Explore 3 different regions", test: (v, a) => new Set(a.map((x) => x.region)).size >= 3 },
+  { id: "first",   icon: "footprints",     colour: "#5f7d3c", name: "First Adventure",  desc: "Visit your first place",       test: (v) => v.length >= 1 },
+  { id: "five",    icon: "star",           colour: "#b0802a", name: "Super Explorer",   desc: "Visit 5 places",              test: (v) => v.length >= 5 },
+  { id: "ten",     icon: "trophy",         colour: "#a5452f", name: "Adventure Legend", desc: "Visit 10 places",             test: (v) => v.length >= 10 },
+  { id: "forest",  icon: "trees",          colour: "#2f5d46", name: "Forest Explorer",  desc: "Visit a trail",               test: (v, a) => a.some((x) => x.type === "Trail") },
+  { id: "walk",    icon: "route",          colour: "#94602f", name: "Wee Wanderer",     desc: "Go on a walk",                test: (v, a) => a.some((x) => x.type === "Walk") },
+  { id: "park",    icon: "tree-deciduous", colour: "#4b7a56", name: "Park Champion",    desc: "Visit a park",                test: (v, a) => a.some((x) => x.type === "Park") },
+  { id: "garden",  icon: "flower-2",       colour: "#865686", name: "Garden Detective", desc: "Visit a garden",              test: (v, a) => a.some((x) => x.type === "Garden") },
+  { id: "beach",   icon: "shell",          colour: "#2f6c8c", name: "Beachcomber",      desc: "Visit a beach",               test: (v, a) => a.some((x) => x.type === "Beach") },
+  { id: "farm",    icon: "tractor",        colour: "#765738", name: "Farm Friend",      desc: "Visit a farm",                test: (v, a) => a.some((x) => x.type === "Farm") },
+  { id: "rain",    icon: "cloud-rain",     colour: "#4d5b69", name: "Rainy Day Hero",   desc: "Visit a rainy-day place",     test: (v, a) => a.some((x) => x.rainy) },
+  { id: "regions", icon: "map",            colour: "#2b5a70", name: "Scotland Roamer",  desc: "Explore 3 different regions", test: (v, a) => new Set(a.map((x) => x.region)).size >= 3 },
 ];
 
 const FAQ = [

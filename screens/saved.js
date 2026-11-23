@@ -1,17 +1,18 @@
 // Saved: favourites, lists, been there
 function renderSaved(tab = "favourites") {
   const tabs = [
-    { id: "favourites", label: "❤️ Favourites" },
-    { id: "lists", label: "📋 Lists" },
-    { id: "been", label: "🏅 Been there" },
+    { id: "favourites", label: "Favourites" },
+    { id: "lists", label: "Lists" },
+    { id: "been", label: "Been there" },
   ];
+  const fmtDate = (d) => new Date(d).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
   let body = "";
 
   if (tab === "favourites") {
     const saved = Store.s.saved.map(byId).filter(Boolean);
     body = saved.length
       ? `<div class="card-list">${saved.map((a) => cardHTML(a)).join("")}</div>`
-      : emptyHTML("🤍", "Nothing saved yet", "Tap “Save” on any place to keep it here for later.", `<a class="btn btn-primary" href="#/explore">Find places</a>`);
+      : emptyHTML("heart", "Nothing saved yet", "Tap Save on any place to keep it here for later", `<a class="btn btn-primary" href="#/explore">Find places</a>`);
   }
 
   if (tab === "lists") {
@@ -22,14 +23,14 @@ function renderSaved(tab = "favourites") {
         <button class="btn btn-primary" type="submit">Create</button>
       </form>
       ${lists.length
-        ? `<div class="menu">${lists.map((l) => {
+        ? `<div class="list-card">${lists.map((l) => {
             const first = byId(l.items[0]);
-            return `<a class="menu-row" href="#/list/${l.id}">
-              <span class="list-thumb" style="--c:${first ? first.colour : "#cfd8d3"}">${first ? first.emoji : "📋"}</span>
-              <span class="menu-text"><strong>${esc(l.name)}</strong><small>${l.items.length} place${l.items.length === 1 ? "" : "s"}</small></span>
-              <span class="chev">›</span></a>`;
+            return `<a class="row link-row" href="#/list/${l.id}">
+              ${thumbHTML(first ? TYPES[first.type] : "list")}
+              <span class="row-text"><strong>${esc(l.name)}</strong><small>${l.items.length} place${l.items.length === 1 ? "" : "s"}</small></span>
+              ${icon("chevron-right", 18, "chev")}</a>`;
           }).join("")}</div>`
-        : emptyHTML("📋", "No lists yet", "Make lists for trips, holidays or rainy days, then add places to them.")}`;
+        : emptyHTML("list", "No lists yet", "Make lists for trips, holidays or rainy days, then add places to them")}`;
   }
 
   if (tab === "been") {
@@ -37,29 +38,28 @@ function renderSaved(tab = "favourites") {
     const earned = earnedBadges().map((b) => b.id);
     const history = [...visits].reverse();
     body = `
-      <div class="stat-row">
-        <div class="stat"><strong>${visits.length}</strong><span>visits</span></div>
-        <div class="stat"><strong>${new Set(visits.map((v) => v.id)).size}</strong><span>places</span></div>
-        <div class="stat"><strong>${earned.length}/${BADGES.length}</strong><span>badges</span></div>
-      </div>
-      <h2 class="section-title">Badges</h2>
+      <dl class="stats">
+        <div><dt>Visits</dt><dd>${visits.length}</dd></div>
+        <div><dt>Places</dt><dd>${new Set(visits.map((v) => v.id)).size}</dd></div>
+        <div><dt>Badges</dt><dd>${earned.length}<span class="of"> of ${BADGES.length}</span></dd></div>
+      </dl>
+      ${trailTitle("Badges")}
       <div class="badge-grid">
         ${BADGES.map((b) => `<div class="badge-tile ${earned.includes(b.id) ? "earned" : ""}">
-          <span class="badge-icon">${b.icon}</span><strong>${b.name}</strong><small>${b.desc}</small></div>`).join("")}
+          ${badgeHTML(b, earned.includes(b.id), 64)}<strong>${b.name}</strong><small>${b.desc}</small></div>`).join("")}
       </div>
-      <h2 class="section-title">Your adventures</h2>
+      ${trailTitle("Your adventures")}
       ${history.length
-        ? `<div class="menu">${history.map((v) => {
+        ? `<ol class="timeline">${history.map((v) => {
             const a = byId(v.id);
             if (!a) return "";
-            return `<div class="menu-row">
-              <a class="menu-link" href="#/activity/${a.id}">
-                <span class="list-thumb" style="--c:${a.colour}">${a.emoji}</span>
-                <span class="menu-text"><strong>${esc(a.name)}</strong><small>${new Date(v.date).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" })}</small></span>
+            return `<li>
+              <a class="timeline-link" href="#/activity/${a.id}">
+                <strong>${esc(a.name)}</strong><small>${fmtDate(v.date)}</small>
               </a>
-              <button class="icon-btn small" data-unvisit="${v.date}" aria-label="Remove visit">✕</button></div>`;
-          }).join("")}</div>`
-        : emptyHTML("🥾", "No adventures yet", "When you visit a place, tap “We've been here!” on its page to collect badges.")}`;
+              <button class="icon-btn small" data-unvisit="${v.date}" aria-label="Remove visit">${icon("x", 16)}</button></li>`;
+          }).join("")}</ol>`
+        : emptyHTML("footprints", "No adventures yet", "When you visit a place, tap We've been here on its page to collect badges")}`;
   }
 
   UI.screen({
@@ -93,10 +93,10 @@ function renderList(id) {
   const items = list.items.map(byId).filter(Boolean);
   UI.screen({
     tab: "saved",
-    top: UI.backBar(esc(list.name), "#/saved/lists", `<button class="icon-btn" id="list-menu" aria-label="List options">⋯</button>`),
+    top: UI.backBar(esc(list.name), "#/saved/lists", `<button class="icon-btn" id="list-menu" aria-label="List options">${icon("ellipsis", 20)}</button>`),
     html: items.length
-      ? `<div class="card-list">${items.map((a) => `<div class="removable">${cardHTML(a)}<button class="remove-x" data-remove="${a.id}" aria-label="Remove ${esc(a.name)} from list">✕</button></div>`).join("")}</div>`
-      : emptyHTML("📋", "This list is empty", "Open any place and tap “Add to list”.", `<a class="btn btn-primary" href="#/explore">Find places</a>`),
+      ? `<div class="card-list">${items.map((a) => `<div class="removable">${cardHTML(a)}<button class="remove-x" data-remove="${a.id}" aria-label="Remove ${esc(a.name)} from list">${icon("x", 16)}</button></div>`).join("")}</div>`
+      : emptyHTML("list", "This list is empty", "Open any place and tap Add to list", `<a class="btn btn-primary" href="#/explore">Find places</a>`),
   });
   $$("[data-remove]").forEach((b) => b.addEventListener("click", () => {
     Store.update((s) => { const l = s.lists.find((x) => x.id === id); l.items = l.items.filter((x) => x !== b.dataset.remove); });
@@ -104,10 +104,10 @@ function renderList(id) {
   }));
   $("#list-menu").addEventListener("click", () => {
     openSheet("List options", `
-      <div class="menu">
-        <button class="menu-row" id="rename"><span class="menu-text"><strong>✏️ Rename list</strong></span></button>
-        <button class="menu-row" id="share-list"><span class="menu-text"><strong>📤 Share list</strong></span></button>
-        <button class="menu-row danger" id="delete"><span class="menu-text"><strong>🗑️ Delete list</strong></span></button>
+      <div class="list-card">
+        <button class="row link-row" id="rename">${icon("pencil", 18)}<span class="row-text"><strong>Rename list</strong></span></button>
+        <button class="row link-row" id="share-list">${icon("share-2", 18)}<span class="row-text"><strong>Share list</strong></span></button>
+        <button class="row link-row danger" id="delete">${icon("trash-2", 18)}<span class="row-text"><strong>Delete list</strong></span></button>
       </div>`, (sheet) => {
       $("#rename", sheet).addEventListener("click", () => {
         const name = prompt("New name", list.name);
@@ -117,7 +117,7 @@ function renderList(id) {
         const text = `${list.name}:\n` + items.map((a) => `• ${a.name} (${a.location})`).join("\n");
         closeSheet();
         if (navigator.share) { try { await navigator.share({ title: list.name, text }); } catch {} }
-        else { try { await navigator.clipboard.writeText(text); toast("List copied!"); } catch {} }
+        else { try { await navigator.clipboard.writeText(text); toast("List copied"); } catch {} }
       });
       $("#delete", sheet).addEventListener("click", () => {
         if (!confirm(`Delete “${list.name}”?`)) return;

@@ -1,9 +1,10 @@
 // Service worker: keeps a copy of the app so it opens quickly and works offline.
-const CACHE = "little-explorers-v3";
+const CACHE = "little-explorers-v4";
 const FILES = [
   "./", "index.html", "styles.css", "config.js", "data.js", "store.js", "ui.js", "app.js",
   "screens/welcome.js", "screens/home.js", "screens/explore.js", "screens/detail.js",
   "screens/saved.js", "screens/suggest.js", "screens/profile.js", "manifest.webmanifest",
+  "icons.js", "fonts/figtree-latin-400-normal.woff2", "fonts/figtree-latin-500-normal.woff2", "fonts/figtree-latin-600-normal.woff2",
   "icons/icon.svg", "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png",
 ];
 

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Little Explorers</title>
   <meta name="description" content="Find family-friendly walks, trails, parks and gardens across Scotland for children aged 0–12." />
-  <meta name="theme-color" content="#2f9e6e" />
+  <meta name="theme-color" content="#f7f4ee" />
 
   <!-- Makes it installable and look like an app on the home screen -->
   <link rel="manifest" href="manifest.webmanifest" />
@@ -16,6 +16,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Explorers" />
 
+  <link rel="preload" href="fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -24,14 +25,15 @@
   <main id="app" class="screen" tabindex="-1"></main>
 
   <nav class="bottom-nav" aria-label="Main">
-    <a href="#/" data-tab="home"><span class="nav-icon" aria-hidden="true">🏠</span><span>Home</span></a>
-    <a href="#/explore" data-tab="explore"><span class="nav-icon" aria-hidden="true">🧭</span><span>Explore</span></a>
-    <a href="#/saved" data-tab="saved"><span class="nav-icon" aria-hidden="true">❤️</span><span>Saved</span></a>
+    <a href="#/" data-tab="home"><span class="nav-icon" data-icon="house"></span><span>Home</span></a>
+    <a href="#/explore" data-tab="explore"><span class="nav-icon" data-icon="compass"></span><span>Explore</span></a>
+    <a href="#/saved" data-tab="saved"><span class="nav-icon" data-icon="heart"></span><span>Saved</span></a>
   </nav>
 
   <script src="config.js"></script>
   <script src="data.js"></script>
   <script src="store.js"></script>
+  <script src="icons.js"></script>
   <script src="ui.js"></script>
   <script src="screens/welcome.js"></script>
   <script src="screens/home.js"></script>

@@ -39,6 +39,11 @@ function goBack(fallback) {
 }
 
 // ---------- Cards ----------
+// Quiet photo slot until real photos arrive: a plain surface with the type's icon
+function photoSlotHTML(a, size = 28) {
+  return `<div class="photo-slot" role="img" aria-label="Photo of ${esc(a.name)} to come">${icon(TYPE_ICONS[a.type], size)}</div>`;
+}
+
 function photoHTML(a, { label = true, badge = true } = {}) {
   return `<div class="photo" style="--c:${a.colour}" role="img" aria-label="Photo placeholder for ${esc(a.name)}">
       ${badge ? `<span class="badge">${TYPES[a.type] || ""} ${esc(a.type)}</span>` : ""}
@@ -50,7 +55,7 @@ function photoHTML(a, { label = true, badge = true } = {}) {
 function tagsFor(a, max = 3) {
   const tags = TAG_PRIORITY.filter((f) => a.facilities.includes(f)).slice(0, max).map((f) => FACILITIES[f].label);
   if (a.free) tags.unshift("Free");
-  if (a.rainy) tags.push("Rainy day ✓");
+  if (a.rainy) tags.push("Rainy day option");
   return tags.slice(0, max + 1);
 }
 
@@ -58,15 +63,15 @@ function cardHTML(a, { compact = false, reason = "" } = {}) {
   const dist = formatDistance(distanceKm(a));
   return `
     <a class="card${compact ? " compact" : ""}" href="#/activity/${a.id}">
-      ${photoHTML(a, { label: !compact })}
-      ${isSaved(a.id) ? `<span class="saved-heart" aria-label="Saved">❤️</span>` : ""}
+      ${photoSlotHTML(a, compact ? 24 : 28)}
+      ${isSaved(a.id) ? `<span class="saved-mark" aria-label="Saved">${icon("heart", 16)}</span>` : ""}
       <div class="card-body">
-        ${reason ? `<div class="reason">✨ ${esc(reason)}</div>` : ""}
+        <p class="kicker">${esc(a.type)}${reason ? `<span class="reason">${esc(reason)}</span>` : ""}</p>
         <h3>${esc(a.name)}</h3>
-        <div class="meta">
-          <span>📍 ${esc(a.location)}${dist ? ` · ${dist}` : ""}</span>
-          <span>⏱️ ${esc(a.duration)}</span>
-        </div>
+        <p class="meta">
+          <span>${icon("map-pin", 16)}${esc(a.location)}${dist ? `<span class="dim"> · ${dist}</span>` : ""}</span>
+          <span>${icon("clock", 16)}${esc(a.duration)}</span>
+        </p>
         <div class="tags">${tagsFor(a, compact ? 1 : 3).map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</div>
       </div>
     </a>`;
@@ -74,8 +79,10 @@ function cardHTML(a, { compact = false, reason = "" } = {}) {
 
 const stars = (n) => "★★★★★".slice(0, Math.round(n)) + "☆☆☆☆☆".slice(0, 5 - Math.round(n));
 
-function emptyHTML(icon, title, text, button = "") {
-  return `<div class="empty"><div class="big">${icon}</div><h2>${title}</h2><p>${text}</p>${button}</div>`;
+function emptyHTML(sym, title, text, button = "") {
+  // sym can be an icon name from icons.js or (for not-yet-redesigned screens) an emoji
+  const art = ICONS[sym] ? `<span class="empty-icon">${icon(sym, 28)}</span>` : `<div class="big">${sym}</div>`;
+  return `<div class="empty">${art}<h2>${title}</h2><p>${text}</p>${button}</div>`;
 }
 
 // ---------- Toast (little message at the bottom) ----------
@@ -98,7 +105,7 @@ function openSheet(title, bodyHTML, onMount) {
     <div class="sheet-backdrop"></div>
     <section class="sheet" role="dialog" aria-modal="true" aria-label="${esc(title)}">
       <div class="sheet-handle"></div>
-      <header class="sheet-head"><h2>${title}</h2><button class="icon-btn small" data-close aria-label="Close">✕</button></header>
+      <header class="sheet-head"><h2>${title}</h2><button class="icon-btn small" data-close aria-label="Close">${icon("x", 18)}</button></header>
       <div class="sheet-body">${bodyHTML}</div>
     </section>`;
   document.body.appendChild(wrap);
@@ -243,7 +250,7 @@ function avatarHTML(size = 44) {
     ? `<img src="${s.photo}" alt="" />`
     : s.familyName
       ? `<span class="avatar-initial">${esc(s.familyName.replace(/^the\s+/i, "").charAt(0).toUpperCase())}</span>`
-      : `<span class="avatar-emoji">👨‍👩‍👧</span>`;
+      : `<span class="avatar-emoji">${icon("users", Math.round(size * 0.45))}</span>`;
   return `<span class="avatar" style="--size:${size}px">${inner}</span>`;
 }
 
@@ -272,3 +279,6 @@ function pickPhoto(onDone) {
   });
   input.click();
 }
+
+// Fill in the bottom bar icons
+document.querySelectorAll("[data-icon]").forEach((el) => { el.innerHTML = icon(el.dataset.icon, 24); });

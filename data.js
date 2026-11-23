@@ -29,6 +29,16 @@ const TYPES = {
   Farm:   "🐑",
 };
 
+// Line icon for each type (see icons.js)
+const TYPE_ICONS = {
+  Walk: "footprints",
+  Trail: "signpost",
+  Park: "tree-deciduous",
+  Garden: "flower-2",
+  Beach: "waves",
+  Farm: "tractor",
+};
+
 // Scottish regions (centre points are approximate)
 const REGIONS = [
   { id: "glasgow",    name: "Glasgow & Clyde",          lat: 55.86, lng: -4.25 },

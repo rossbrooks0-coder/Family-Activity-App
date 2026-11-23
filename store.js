@@ -117,7 +117,10 @@ function matchScore(a) {
 function matchReason(a) {
   const s = Store.s;
   const okKids = s.children.filter((c) => ageOk(a, c.age));
-  if (s.children.length && okKids.length === s.children.length) return s.children.length > 1 ? "Great for all your kids" : "Great for your child's age";
+  if (s.children.length && okKids.length === s.children.length) {
+    if (s.children.length > 1) return "Suits all your children";
+    return s.children[0].name ? `Suits ${s.children[0].name}'s age` : "Suits your child's age";
+  }
   const need = s.needs.find((n) => a.facilities.includes(n));
   if (need) return FACILITIES[need].label;
   return "Popular with families";

@@ -2,7 +2,12 @@
 function renderWelcome(step = 0) {
   const steps = 3;
   const go = (n) => renderWelcome(n);
-  const finish = () => { Store.update((s) => { s.onboarded = true; }); location.hash = "#/"; };
+  const finish = () => {
+    Store.update((s) => { s.onboarded = true; });
+    // If the address is already #/ setting it again does nothing, so show home directly
+    if (location.hash === "#/") route();
+    else location.hash = "#/";
+  };
 
   if (step === 0) {
     UI.screen({

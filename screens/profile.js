@@ -10,8 +10,8 @@ function renderProfile() {
 
   const badges = earnedBadges().length;
   UI.screen({
-    tab: "",
-    top: UI.backBar("Profile", "#/"),
+    tab: "profile",
+    top: UI.title("Profile"),
     html: `
       <div class="family-card">
         <button class="family-photo" id="photo" aria-label="${s.photo ? "Change family photo" : "Add a family photo"}">
@@ -110,7 +110,7 @@ function renderProfile() {
 
 function renderProfileChildren() {
   UI.screen({
-    tab: "",
+    tab: "profile",
     top: UI.backBar("Children", "#/profile"),
     html: `<p class="lede">We use your children's ages to pick places that suit them</p><div id="kids">${childrenEditorHTML()}</div>`,
   });
@@ -119,7 +119,7 @@ function renderProfileChildren() {
 
 function renderProfileNeeds() {
   UI.screen({
-    tab: "",
+    tab: "profile",
     top: UI.backBar("What matters to you", "#/profile"),
     html: `<p class="lede">We'll show places with these first</p><div id="needs">${needsPickerHTML()}</div>`,
   });
@@ -128,7 +128,7 @@ function renderProfileNeeds() {
 
 function renderProfileArea() {
   UI.screen({
-    tab: "",
+    tab: "profile",
     top: UI.backBar("Location", "#/profile"),
     html: `<p class="lede">We'll show places near you first and work out distances</p><div id="area">${areaPickerHTML()}</div>`,
   });
@@ -137,7 +137,7 @@ function renderProfileArea() {
 
 function renderHelp() {
   UI.screen({
-    tab: "",
+    tab: "profile",
     top: UI.backBar("Help and questions", "#/profile"),
     html: `<div class="faq">${FAQ.map((f) => `<details class="faq-item"><summary>${esc(f.q)}${icon("chevron-down", 18)}</summary><p>${esc(f.a)}</p></details>`).join("")}</div>`,
   });
@@ -145,7 +145,7 @@ function renderHelp() {
 
 function renderAbout() {
   UI.screen({
-    tab: "",
+    tab: "profile",
     top: UI.backBar("About", "#/profile"),
     html: `
       <section class="welcome-hero small">
@@ -160,6 +160,6 @@ function renderAbout() {
 function renderNotFound() {
   UI.screen({
     top: UI.backBar("", "#/"),
-    html: emptyHTML("telescope", "We couldn't find that page", "It may have been moved or removed.", `<a class="btn btn-primary" href="#/">Back to home</a>`),
+    html: emptyHTML("telescope", "We couldn't find that page", "It may have been moved or removed.", `<a class="btn btn-primary" href="#/">Back to Explore</a>`),
   });
 }

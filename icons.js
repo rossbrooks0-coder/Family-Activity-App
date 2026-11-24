@@ -34,6 +34,7 @@ const ICONS = {
   "list-plus": `<path d="M11 12H3" /> <path d="M16 6H3" /> <path d="M16 18H3" /> <path d="M18 9v6" /> <path d="M21 12h-6" />`,
   "navigation": `<polygon points="3 11 22 2 13 21 11 13 3 11" />`,
   "locate-fixed": `<line x1="2" x2="5" y1="12" y2="12" /> <line x1="19" x2="22" y1="12" y2="12" /> <line x1="12" x2="12" y1="2" y2="5" /> <line x1="12" x2="12" y1="19" y2="22" /> <circle cx="12" cy="12" r="7" /> <circle cx="12" cy="12" r="3" />`,
+  "user": `<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /> <circle cx="12" cy="7" r="4" />`,
   "users": `<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /> <circle cx="9" cy="7" r="4" /> <path d="M22 21v-2a4 4 0 0 0-3-3.87" /> <path d="M16 3.13a4 4 0 0 1 0 7.75" />`,
   "route": `<circle cx="6" cy="19" r="3" /> <path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" /> <circle cx="18" cy="5" r="3" />`,
   "search": `<circle cx="11" cy="11" r="8" /> <path d="m21 21-4.3-4.3" />`,

@@ -95,7 +95,7 @@ function renderList(id) {
     tab: "saved",
     top: UI.backBar(esc(list.name), "#/saved/lists", `<button class="icon-btn" id="list-menu" aria-label="List options">${icon("ellipsis", 20)}</button>`),
     html: items.length
-      ? `<div class="card-list">${items.map((a) => `<div class="removable">${cardHTML(a)}<button class="remove-x" data-remove="${a.id}" aria-label="Remove ${esc(a.name)} from list">${icon("x", 16)}</button></div>`).join("")}</div>`
+      ? `<div class="card-list">${items.map((a) => `<div class="removable">${cardHTML(a, { save: false })}<button class="remove-x" data-remove="${a.id}" aria-label="Remove ${esc(a.name)} from list">${icon("x", 16)}</button></div>`).join("")}</div>`
       : emptyHTML("list", "This list is empty", "Open any place and tap Add to list", `<a class="btn btn-primary" href="#/">Find places</a>`),
   });
   $$("[data-remove]").forEach((b) => b.addEventListener("click", () => {

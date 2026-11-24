@@ -56,12 +56,13 @@ function tagsFor(a, max = 3) {
   return tags.slice(0, max + 1);
 }
 
-function cardHTML(a, { compact = false, reason = "" } = {}) {
+function cardHTML(a, { compact = false, reason = "", save = true } = {}) {
   const dist = formatDistance(distanceKm(a));
+  const saved = isSaved(a.id);
   return `
     <a class="card${compact ? " compact" : ""}" href="#/activity/${a.id}">
       ${photoSlotHTML(a, compact ? 24 : 28)}
-      ${isSaved(a.id) ? `<span class="saved-mark" aria-label="Saved">${icon("heart", 16)}</span>` : ""}
+      ${save ? `<button type="button" class="card-save" data-save="${a.id}" aria-pressed="${saved}" aria-label="${saved ? "Remove " + esc(a.name) + " from saved" : "Save " + esc(a.name)}">${icon("heart", 20)}</button>` : ""}
       <div class="card-body">
         <p class="kicker">${esc(a.type)}${reason ? `<span class="reason">${esc(reason)}</span>` : ""}</p>
         <h3>${esc(a.name)}</h3>
@@ -73,6 +74,21 @@ function cardHTML(a, { compact = false, reason = "" } = {}) {
       </div>
     </a>`;
 }
+
+// Heart on a card: save or unsave without opening the place
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-save]");
+  if (!b) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const a = byId(b.dataset.save);
+  const on = toggleSaved(a.id);
+  b.setAttribute("aria-pressed", on);
+  b.setAttribute("aria-label", on ? `Remove ${a.name} from saved` : `Save ${a.name}`);
+  toast(on ? "Saved" : "Removed from saved");
+  // On the Saved page, unsaving takes the card away
+  if (!on && /^#\/saved/.test(location.hash)) route();
+}, true);
 
 // Small square thumbnail used in lists
 const thumbHTML = (iconName) => `<span class="thumb">${icon(iconName, 20)}</span>`;

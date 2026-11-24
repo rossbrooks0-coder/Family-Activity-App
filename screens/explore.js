@@ -69,10 +69,13 @@ function renderExplore() {
   UI.screen({
     tab: "explore",
     html: `
-      <div class="search-wrap">
-        <span class="search-icon">${icon("search", 18)}</span>
-        <input id="search" class="input search" type="search" placeholder="Search" value="${esc(Explore.q)}" autocomplete="off" enterkeyhint="search" aria-label="Search" />
-        <button class="search-filter" id="open-filters" aria-label="Filters">${icon("list-filter", 20)}<span id="filter-count" class="count-badge"></span></button>
+      <div class="search-row">
+        <a class="avatar-link" href="#/profile" aria-label="Your profile">${avatarHTML(52)}</a>
+        <div class="search-wrap">
+          <span class="search-icon">${icon("search", 18)}</span>
+          <input id="search" class="input search" type="search" placeholder="Search" value="${esc(Explore.q)}" autocomplete="off" enterkeyhint="search" aria-label="Search" />
+          <button class="search-filter" id="open-filters" aria-label="Filters">${icon("list-filter", 20)}<span id="filter-count" class="count-badge"></span></button>
+        </div>
       </div>
       ${typeRowHTML(Explore.type)}
       <div id="result-line"></div>

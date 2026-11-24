@@ -156,7 +156,7 @@ const typeOptions = () => Object.keys(TYPES).map((t) => ({ value: t, label: t, i
 // Row of activity types with icons (home and explore)
 function typeRowHTML(current) {
   return `<div class="type-row" role="group" aria-label="Type of place">
-    ${["All", ...Object.keys(TYPES)].map((t) => `<button class="type-chip" data-type="${t}" aria-pressed="${t === current}">${icon(t === "All" ? "layout-grid" : TYPES[t], 18)}<span>${t === "All" ? "All" : pluralType(t)}</span></button>`).join("")}
+    ${["All", ...Object.keys(TYPES)].map((t) => `<button class="type-chip" data-type="${t}" aria-pressed="${t === current}">${icon(t === "All" ? "navigation" : TYPES[t], 18)}<span>${t === "All" ? "Nearby" : pluralType(t)}</span></button>`).join("")}
   </div>`;
 }
 

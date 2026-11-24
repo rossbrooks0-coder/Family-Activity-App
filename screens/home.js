@@ -27,7 +27,7 @@ function renderHome() {
 
   const hasRef = !!refPoint();
   const r = Store.s.homeRadius;
-  const rangeLabel = !hasRef ? "Set your area" : r ? `Within ${r} ${unitShort()}` : "Any distance";
+  const rangeLabel = !hasRef ? "Use my location" : r ? `Within ${r} ${unitShort()}` : "Any distance";
   const plural = homeType === "All" ? "places" : pluralType(homeType).toLowerCase();
 
   let body;
@@ -79,7 +79,7 @@ function openRangePicker() {
   const unit = unitShort();
   const current = Store.s.homeRadius ? String(Store.s.homeRadius) : "any";
   openSheet("Show places within", `
-    <p class="sheet-note">Measured from ${esc(areaName())} · <a class="link" href="#/profile/area">Change</a></p>
+    <p class="sheet-note">Measured from your location</p>
     <div class="choice-list">
       ${[...RADIUS_OPTIONS.map((r) => ({ v: String(r), label: `${r} ${unit}` })), { v: "any", label: "Any distance" }]
         .map((o) => `<button type="button" class="choice" data-r="${o.v}" aria-pressed="${o.v === current}"><span>${o.label}</span>${icon("check", 18)}</button>`).join("")}

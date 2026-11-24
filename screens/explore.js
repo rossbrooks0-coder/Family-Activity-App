@@ -35,7 +35,7 @@ function exploreResults() {
   const term = q.trim().toLowerCase();
   let list = ACTIVITIES.filter((a) => {
     if (term) {
-      const hay = [a.name, a.location, a.type, a.description, regionById(a.region)?.name, ...a.highlights].join(" ").toLowerCase();
+      const hay = [a.name, a.location, a.type, a.description, ...a.highlights].join(" ").toLowerCase();
       if (!term.split(/\s+/).every((w) => hay.includes(w))) return false;
     }
     if (f.types.length && !f.types.includes(a.type)) return false;
@@ -103,7 +103,7 @@ function drawResults() {
   $("#filter-count").textContent = n ? String(n) : "";
   $("#active-filters").innerHTML = n
     ? `<div class="result-line"><span>${list.length} place${list.length === 1 ? "" : "s"} found${sortNote}</span><button class="btn-link" id="clear-filters">Clear filters</button></div>`
-    : `<div class="result-line"><span>${list.length} place${list.length === 1 ? "" : "s"} in ${esc(areaName())}${sortNote}</span></div>`;
+    : `<div class="result-line"><span>${list.length} place${list.length === 1 ? "" : "s"} ${Store.s.coords ? "near you" : "across Scotland"}${sortNote}</span></div>`;
   const clear = $("#clear-filters");
   if (clear) clear.addEventListener("click", () => { const q = Explore.q; Explore.reset(); Explore.q = q; drawResults(); });
 

@@ -19,10 +19,6 @@ function renderSuggest() {
           <span class="field-label">Where is it? <em>*</em></span>
           <input class="input" name="location" required maxlength="120" placeholder="Town, postcode or how to find it" />
         </label>
-        <label class="field">
-          <span class="field-label">Region</span>
-          <span class="select-wrap"><select name="region"><option value="">Not sure</option>${REGIONS.map((r) => `<option value="${r.id}" ${Store.s.region === r.id ? "selected" : ""}>${r.name}</option>`).join("")}</select></span>
-        </label>
 
         <span class="field-label">What kind of place?</span>
         ${chipGroup("type", [...typeOptions(), { value: "Other", label: "Other" }], [], { multi: false })}
@@ -80,7 +76,7 @@ function renderSuggest() {
       id: uid(),
       date: new Date().toISOString(),
       status: "Sent for review",
-      name: d.name.trim(), location: d.location.trim(), region: d.region,
+      name: d.name.trim(), location: d.location.trim(),
       type: chipValues(form, "type")[0] || "", time: chipValues(form, "time")[0] || "",
       ageMin: Number(d.ageMin), ageMax: Number(d.ageMax),
       facilities: chipValues(form, "facilities"),
@@ -96,7 +92,7 @@ function renderSuggest() {
 function sendSuggestion(sg) {
   if (!CONFIG.suggestionsEmail) return;
   const lines = [
-    `Place: ${sg.name}`, `Location: ${sg.location}`, `Region: ${regionById(sg.region)?.name || "Not sure"}`,
+    `Place: ${sg.name}`, `Location: ${sg.location}`,
     `Type: ${sg.type || "-"}`, `Ages: ${sg.ageMin}–${sg.ageMax}`, `Time spent: ${sg.time || "-"}`,
     `Facilities: ${sg.facilities.map((f) => FACILITIES[f].label).join(", ") || "-"}`,
     ``, `Why: ${sg.why}`, ``, `Tips: ${sg.tips || "-"}`, ``, `From: ${sg.by || "Anonymous"} ${sg.email ? "(" + sg.email + ")" : ""}`,

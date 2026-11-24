@@ -47,6 +47,10 @@ let routedOnce = false;
 window.addEventListener("hashchange", route);
 route();
 
+// Keep the family's location up to date, e.g. after driving somewhere new
+refreshLocation();
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refreshLocation(); });
+
 // ---------- Offline support / installability ----------
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));

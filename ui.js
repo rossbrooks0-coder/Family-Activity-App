@@ -200,50 +200,49 @@ function bindNeedsPicker(root, onChange) {
   }));
 }
 
-// Area picker
+// Location: once switched on, it is refreshed every time the app is opened,
+// so places nearby follow the family wherever they are
 function areaPickerHTML() {
-  const s = Store.s;
+  const on = !!Store.s.coords;
   return `
-    <button type="button" class="btn ${s.coords ? "btn-primary" : "btn-secondary"} full" id="use-location">
-      ${icon("locate-fixed", 18)}${s.coords ? "Using your location" : "Use my location"}
+    <button type="button" class="btn ${on ? "btn-primary" : "btn-secondary"} full" id="use-location" ${on ? "aria-pressed=\"true\"" : ""}>
+      ${icon(on ? "check" : "locate-fixed", 18)}${on ? "Using your location" : "Use my location"}
     </button>
-    <p class="or">or choose a region</p>
-    <div class="choice-list">
-      ${REGIONS.map((r) => `<button type="button" class="choice" data-region="${r.id}" aria-pressed="${s.region === r.id}">
-        <span>${r.name}</span>${icon("check", 18)}</button>`).join("")}
-    </div>`;
+    <p class="or">${on
+      ? "We'll update this each time you open the app, so you always see places near where you are"
+      : "Your location stays on this phone and is only used to show places near you"}</p>`;
 }
 function bindAreaPicker(root, rerender) {
-  $$("[data-region]", root).forEach((b) => b.addEventListener("click", () => {
-    Store.update((s) => { s.region = b.dataset.region; s.coords = null; });
-    rerender();
-  }));
   $("#use-location", root).addEventListener("click", () => {
-    if (Store.s.coords) { Store.update((s) => { s.coords = null; }); return rerender(); }
     if (!navigator.geolocation) return toast("Location isn't available on this device");
     toast("Finding your location…");
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude: lat, longitude: lng } = pos.coords;
-        // pick the nearest region too, so we can show its name
-        const nearest = REGIONS.reduce((best, r) => {
-          const d = (r.lat - lat) ** 2 + (r.lng - lng) ** 2;
-          return d < best.d ? { r, d } : best;
-        }, { d: Infinity }).r;
-        Store.update((s) => { s.coords = { lat, lng }; s.region = nearest.id; });
-        toast("Location set");
-        rerender();
-      },
-      () => toast("Couldn't get your location. Pick a region instead."),
-      { timeout: 10000, maximumAge: 600000 }
+    getPosition(
+      (coords) => { Store.update((s) => { s.coords = coords; }); toast("Location set"); rerender(); },
+      () => toast("Couldn't get your location. Allow location for this app in your phone's settings, then try again.")
     );
   });
 }
 
-function areaName() {
-  const r = regionById(Store.s.region);
-  if (Store.s.coords) return r ? `Near you (${r.name})` : "Near you";
-  return r ? r.name : "All of Scotland";
+function getPosition(ok, fail = () => {}) {
+  if (!navigator.geolocation) return fail();
+  navigator.geolocation.getCurrentPosition(
+    (pos) => ok({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+    fail,
+    { timeout: 15000, maximumAge: 0 } // always a fresh position, not a saved one
+  );
+}
+
+// Called when the app opens and whenever it comes back on screen
+function refreshLocation() {
+  if (!Store.s.coords) return; // only once the family has switched location on
+  getPosition((coords) => {
+    const old = Store.s.coords;
+    const movedKm = distanceKm({ lat: coords.lat, lng: coords.lng });
+    Store.update((s) => { s.coords = coords; });
+    // Redraw lists that depend on distance if they've moved noticeably
+    const page = location.hash.replace(/^#\/?/, "").split("/")[0];
+    if (old && movedKm > 1 && (page === "" || page === "explore") && !$(".sheet-wrap")) route();
+  });
 }
 
 // ---------- Family photo ----------

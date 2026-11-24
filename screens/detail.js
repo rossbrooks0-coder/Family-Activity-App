@@ -2,7 +2,6 @@
 function renderDetail(id) {
   const a = byId(id);
   if (!a) return renderNotFound();
-  const region = regionById(a.region);
   const dist = formatDistance(distanceKm(a));
   const avg = a.reviews.reduce((t, r) => t + r.rating, 0) / (a.reviews.length || 1);
   const ticked = Store.s.checklists[a.id] || [];
@@ -28,7 +27,7 @@ function renderDetail(id) {
 
         <p class="kicker">${esc(a.type)}</p>
         <h2 class="detail-title">${esc(a.name)}</h2>
-        <p class="detail-meta">${icon("map-pin", 16)}<span>${esc(a.location)}, ${esc(region?.name || "")}${dist ? ` · ${dist} away` : ""}</span></p>
+        <p class="detail-meta">${icon("map-pin", 16)}<span>${esc(a.location)}${dist ? ` · ${dist} away` : ""}</span></p>
         <p class="detail-meta"><span class="stars" aria-hidden="true">${stars(avg)}</span><span>${avg.toFixed(1)} from ${a.reviews.length} review${a.reviews.length === 1 ? "" : "s"}</span></p>
 
         <dl class="facts">

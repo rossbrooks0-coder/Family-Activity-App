@@ -40,7 +40,7 @@ function renderProfile() {
 
       ${trailTitle("Settings")}
       <div class="list-card">
-        ${row("#/profile/area", "map-pin", "Your area", esc(areaName()))}
+        ${row("#/profile/area", "map-pin", "Location", s.coords ? "Using your location" : "Off")}
         <div class="row">
           ${icon("ruler", 18)}<span class="row-text"><strong>Distances in</strong></span>
           <div class="segmented small" role="group" aria-label="Distance units">
@@ -129,7 +129,7 @@ function renderProfileNeeds() {
 function renderProfileArea() {
   UI.screen({
     tab: "",
-    top: UI.backBar("Your area", "#/profile"),
+    top: UI.backBar("Location", "#/profile"),
     html: `<p class="lede">We'll show places near you first and work out distances</p><div id="area">${areaPickerHTML()}</div>`,
   });
   bindAreaPicker($("#area"), renderProfileArea);

@@ -8,8 +8,7 @@ const Store = (() => {
     homeRadius: null,      // home page range, in the user's units (null = anywhere)
     children: [],          // [{ id, name, age }]
     needs: [],             // facility ids that matter, e.g. ["pushchair", "toilets"]
-    region: null,          // region id
-    coords: null,          // { lat, lng } if location was shared
+    coords: null,          // { lat, lng } last known position, refreshed each time the app opens
     units: "miles",
     saved: [],             // activity ids
     lists: [],             // [{ id, name, items: [activity ids] }]
@@ -45,7 +44,6 @@ const Store = (() => {
 // ---------- Small helpers built on the store ----------
 const uid = () => Math.random().toString(36).slice(2, 9);
 const byId = (id) => ACTIVITIES.find((a) => a.id === id);
-const regionById = (id) => REGIONS.find((r) => r.id === id);
 
 function isSaved(id) { return Store.s.saved.includes(id); }
 function toggleSaved(id) {
@@ -63,11 +61,9 @@ function earnedBadges(visits = Store.s.visits) {
   return BADGES.filter((b) => b.test(visits, acts));
 }
 
-// Where distances are measured from: shared location, else chosen region
+// Where distances are measured from: the phone's location
 function refPoint() {
-  if (Store.s.coords) return Store.s.coords;
-  const r = regionById(Store.s.region);
-  return r ? { lat: r.lat, lng: r.lng } : null;
+  return Store.s.coords || null;
 }
 function distanceKm(a) {
   const p = refPoint();

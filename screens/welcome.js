@@ -31,7 +31,7 @@ function renderWelcome(step = 0) {
   const content = {
     1: { title: "Who's exploring?", sub: "Add your children so we can suggest places that suit their ages", body: childrenEditorHTML() },
     2: { title: "What matters to you?", sub: "Pick anything that's important when you're out and about", body: needsPickerHTML() },
-    3: { title: "Where are you?", sub: "We'll show places near you first", body: areaPickerHTML() },
+    3: { title: "Where are you?", sub: "Turn on your location and we'll always show places near where you are, even when you're away from home", body: areaPickerHTML() },
   }[step];
 
   // Progress shown as a dotted trail with a stop for each step

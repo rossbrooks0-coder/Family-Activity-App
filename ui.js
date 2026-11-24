@@ -16,6 +16,7 @@ const UI = {
     this.nav.hidden = !nav;
     document.body.classList.toggle("no-nav", !nav);
     document.body.classList.toggle("no-top", !top);
+    document.body.classList.remove("map-mode");
     $$(".bottom-nav a").forEach((a) => {
       const on = a.dataset.tab === tab;
       a.classList.toggle("active", on);
@@ -249,7 +250,7 @@ function refreshLocation() {
     Store.update((s) => { s.coords = coords; });
     // Redraw lists that depend on distance if they've moved noticeably
     const page = location.hash.replace(/^#\/?/, "").split("/")[0];
-    if (old && movedKm > 1 && (page === "" || page === "explore") && !$(".sheet-wrap")) route();
+    if (old && movedKm > 1 && (page === "" || page === "explore" || page === "map") && !$(".sheet-wrap")) route();
   });
 }
 

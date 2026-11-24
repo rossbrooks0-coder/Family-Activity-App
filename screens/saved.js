@@ -12,7 +12,7 @@ function renderSaved(tab = "favourites") {
     const saved = Store.s.saved.map(byId).filter(Boolean);
     body = saved.length
       ? `<div class="card-list">${saved.map((a) => cardHTML(a)).join("")}</div>`
-      : emptyHTML("heart", "Nothing saved yet", "Tap Save on any place to keep it here for later", `<a class="btn btn-primary" href="#/explore">Find places</a>`);
+      : emptyHTML("heart", "Nothing saved yet", "Tap Save on any place to keep it here for later", `<a class="btn btn-primary" href="#/">Find places</a>`);
   }
 
   if (tab === "lists") {
@@ -96,7 +96,7 @@ function renderList(id) {
     top: UI.backBar(esc(list.name), "#/saved/lists", `<button class="icon-btn" id="list-menu" aria-label="List options">${icon("ellipsis", 20)}</button>`),
     html: items.length
       ? `<div class="card-list">${items.map((a) => `<div class="removable">${cardHTML(a)}<button class="remove-x" data-remove="${a.id}" aria-label="Remove ${esc(a.name)} from list">${icon("x", 16)}</button></div>`).join("")}</div>`
-      : emptyHTML("list", "This list is empty", "Open any place and tap Add to list", `<a class="btn btn-primary" href="#/explore">Find places</a>`),
+      : emptyHTML("list", "This list is empty", "Open any place and tap Add to list", `<a class="btn btn-primary" href="#/">Find places</a>`),
   });
   $$("[data-remove]").forEach((b) => b.addEventListener("click", () => {
     Store.update((s) => { const l = s.lists.find((x) => x.id === id); l.items = l.items.filter((x) => x !== b.dataset.remove); });

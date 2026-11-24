@@ -1,6 +1,6 @@
 // Little Explorers – decides which screen to show.
 // Screens are chosen by the part of the web address after "#",
-// e.g. #/activity/lochside-loop or #/saved/lists
+// e.g. #/activity/lochside-loop or #/saved/lists. The app opens on Explore (#/)
 
 function route() {
   closeSheet();
@@ -19,9 +19,10 @@ function route() {
   if (!Store.s.onboarded && page === "") return renderWelcome(0);
 
   switch (page) {
-    case "": renderHome(); break;
+    case "": renderExplore(); break;
     case "welcome": renderWelcome(0); break;
     case "explore": renderExplore(); break;
+    case "map": renderMap(); break;
     case "activity": renderDetail(id); break;
     case "saved": renderSaved(["favourites", "lists", "been"].includes(id) ? id : "favourites"); break;
     case "list": renderList(id); break;

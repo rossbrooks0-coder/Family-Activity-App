@@ -12,7 +12,7 @@ It can be installed to a phone's home screen like a normal app (it's a "Progress
 | `data.js` | **The places, regions, badges and help questions. Edit this to change the content.** |
 | `store.js` | Remembers things on the phone: children, saved places, lists, visits |
 | `ui.js` | Shared building blocks (cards, pop-up panels, messages) |
-| `screens/` | One file per screen: welcome, home, explore, detail, saved, suggest, profile |
+| `screens/` | One file per screen: welcome, explore, map, detail, saved, suggest, profile |
 | `app.js` | Decides which screen to show |
 | `manifest.webmanifest` | App name, colours and icons used when installed |
 | `sw.js` | Lets the app open fast and work offline |

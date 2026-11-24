@@ -1,5 +1,6 @@
 // Home screen
 let homeType = "All";
+let homeTypeScroll = 0;
 
 const RADIUS_OPTIONS = [5, 10, 20, 30, 50];
 
@@ -61,7 +62,11 @@ function renderHome() {
       ${body}`,
   });
 
+  // Keep the type bar where it was scrolled to when the page redraws
+  const typeRow = $(".type-row");
+  typeRow.scrollLeft = homeTypeScroll;
   $$("[data-type]").forEach((b) => b.addEventListener("click", () => {
+    homeTypeScroll = typeRow.scrollLeft;
     homeType = b.dataset.type;
     renderHome();
   }));

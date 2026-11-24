@@ -20,7 +20,6 @@ function renderHome() {
     .sort((a, b) => matchScore(b) - matchScore(a));
   const picked = ranked.slice(0, 5);
   const seasonal = ranked.filter((a) => a.seasons.includes(season)).slice(0, 6);
-  const types = ["All", ...Object.keys(TYPES)];
 
   const row = (list, reason) => `<div class="hscroll">${list.map((a) => cardHTML(a, { compact: true, reason: reason ? matchReason(a) : "" })).join("")}</div>`;
   const heading = (text, extra = "") => `<h2 class="trail-title"><span>${text}</span>${extra}</h2>`;
@@ -56,9 +55,7 @@ function renderHome() {
           <div class="spacer"></div>
           <button class="range-btn" id="range">${icon("map-pin", 16)}<span>${rangeLabel}</span>${icon("chevron-down", 16)}</button>`,
     html: `
-      <div class="type-row" role="group" aria-label="Type of place">
-        ${types.map((t) => `<button class="type-chip" data-type="${t}" aria-pressed="${t === homeType}">${icon(t === "All" ? "layout-grid" : TYPES[t], 18)}<span>${t === "All" ? "All" : pluralType(t)}</span></button>`).join("")}
-      </div>
+      ${typeRowHTML(homeType)}
       ${body}`,
   });
 

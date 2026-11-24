@@ -15,6 +15,7 @@ const UI = {
     this.app.innerHTML = html;
     this.nav.hidden = !nav;
     document.body.classList.toggle("no-nav", !nav);
+    document.body.classList.toggle("no-top", !top);
     $$(".bottom-nav a").forEach((a) => {
       const on = a.dataset.tab === tab;
       a.classList.toggle("active", on);
@@ -151,6 +152,13 @@ function bindChipGroups(root) {
 const chipValues = (root, name) => $$(`.chip-wrap[data-group="${name}"] .chip[aria-pressed="true"]`, root).map((c) => c.dataset.value);
 const facilityOptions = () => Object.keys(FACILITIES).map((k) => ({ value: k, label: FACILITIES[k].label, icon: FACILITIES[k].icon }));
 const typeOptions = () => Object.keys(TYPES).map((t) => ({ value: t, label: t, icon: TYPES[t] }));
+
+// Row of activity types with icons (home and explore)
+function typeRowHTML(current) {
+  return `<div class="type-row" role="group" aria-label="Type of place">
+    ${["All", ...Object.keys(TYPES)].map((t) => `<button class="type-chip" data-type="${t}" aria-pressed="${t === current}">${icon(t === "All" ? "layout-grid" : TYPES[t], 18)}<span>${t === "All" ? "All" : pluralType(t)}</span></button>`).join("")}
+  </div>`;
+}
 
 // Children editor (used in welcome screens and profile)
 function childrenEditorHTML() {
